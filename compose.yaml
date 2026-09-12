@@ -1,0 +1,34 @@
+services:
+
+  app:
+    build: .
+    image: workshop-organizer
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/workshopsdb"
+      SPRING_DATASOURCE_USERNAME: workshops_user
+      SPRING_DATASOURCE_PASSWORD: oc2024
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18-alpine
+    volumes:
+      - postgres18-data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: workshops_user
+      POSTGRES_PASSWORD: oc2024
+      POSTGRES_DB: workshopsdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workshops_user -d workshopsdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres18-data:
