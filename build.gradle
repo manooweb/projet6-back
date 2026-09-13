@@ -74,24 +74,3 @@ test {
 war {
     enabled = false
 }
-
-publishing {
-    publications {
-		MavenPublication(MavenPublication) {
-			artifact bootWar
-		}
-    }
-    repositories {
-		maven {
-			url "https://gitlab.com/api/v4/projects/$System.env.GITLAB_PROJECT_ID/packages/maven"
-			name "GitLab"
-			credentials(HttpHeaderCredentials) {
-				name = System.getenv("GITLAB_TOKEN_NAME")
-				value = System.getenv("GITLAB_TOKEN")
-			}
-			authentication {
-				header(HttpHeaderAuthentication)
-			}
-		}
-    }
-}

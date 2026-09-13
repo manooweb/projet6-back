@@ -7,9 +7,10 @@ Welcome to the Workshop Organizer Web API! This application is designed to facil
 1. Context
 2. Technical Overview
 3. Building and Running
-4. Testing
-5. Packaging
-6. Publishing to GitLab Registry
+4. Configuration
+5. Testing
+6. Packaging
+7. Continuous Integration and Releases
 
 ## Context
 
@@ -18,7 +19,7 @@ Workshops play a crucial role in fostering learning and collaboration. Our appli
 ## Technical Overview
 
 - **Java Development Kit (JDK):** We use **JDK 21**, tested with **Adoptium**, to power our application.
-- **Database:** Our backend relies on a **PostgreSQL 13** database for data storage.
+- **Database:** Our backend relies on a **PostgreSQL 18** database for data storage.
 - **Build Tool:** We leverage **Gradle 8.7** for managing dependencies and building the project.
 - **Spring Boot:** Our application is based on **Spring Boot 3.2.4**, which provides a robust framework for creating RESTful APIs.
 - **Application Server:** Our application can run on Tomcat server that require version 10.1.24.
@@ -42,11 +43,13 @@ To compile and run the application locally, follow these steps:
    ```
    For production, package the application as WAR and use a tomcat server
 
-To run correctly the application with docker after you building it with tag workshop-organizer, run the following
+After configuring `.env`, start the local Docker stack with:
 
 ```bash
-docker compose up -d
+docker compose up --build -d
 ```
+
+The API is available at `http://localhost:8080/`. Stop the local stack with `docker compose down`.
 
 ## Configuration
 
@@ -67,39 +70,38 @@ Docker Compose derives the Spring Boot datasource settings from these values.
 
 ## Testing
 
-We take testing seriously! To verify the correctness of our application, run the following command:
+To run tests locally, run:
 
 ```bash
 ./gradlew clean test
 ```
 
-During execution junit reports are generated in the `build/test-results/test` folder.
+Gradle writes its reports to `build/test-results/test`. For CI, `./run-tests.sh` cleans `test-results/`, runs `./gradlew clean test`, and copies the JUnit XML reports there.
 
 ## Packaging
 
-When you’re ready to package the application for deployment, create a deployable WAR file:
+To create a deployable WAR file locally, run:
 
 ```bash
 ./gradlew bootWar
 ```
 
-The generated war file can be used with many application servers such as Tomcat, Wildfly...
+The generated WAR can be used with application servers such as Tomcat or WildFly. The CI workflow builds the Docker image directly from the source code.
 
-## Publishing to GitLab Registry
+## Continuous Integration and Releases
 
-To publish your application to a GitLab registry, follow these steps:
+GitHub Actions runs tests for pull requests targeting `main` and for pushes to `main`. JUnit reports are available as workflow artifacts and are published in GitHub checks.
 
-1. Set up your GitLab project.
-2. Ensure you have the following environment variables configured:
+Each push builds and publishes a Docker image to GitHub Container Registry:
 
-   - GITLAB_PROJECT_ID: The ID of your GitLab project.
-   - GITLAB_TOKEN_NAME: The name of the GitLab access token.
-   - GITLAB_TOKEN: Your GitLab access token.
+```text
+ghcr.io/manooweb/projet6-back:<branch>-<commit-sha>
+```
 
-3. Execute the following command to publish your application:
-   ```bash
-   ./gradlew publish
-   ```
-   Remember to replace placeholders with actual values specific to your project.
+On `main`, semantic-release creates GitHub releases, Git tags without a `v` prefix, and updates `CHANGELOG.md`, `build.gradle`, `package.json`, and `package-lock.json` when a release-worthy Conventional Commit is pushed. The corresponding Docker image is also tagged with the semantic version, for example:
 
-Feel free to enhance this README with additional details, such as API endpoints, security considerations, and deployment instructions. Happy organizing! 🚀
+```text
+ghcr.io/manooweb/projet6-back:1.0.0
+```
+
+Commits of type `ci:` run the workflow but do not create a release.
