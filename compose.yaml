@@ -6,9 +6,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/workshopsdb"
-      SPRING_DATASOURCE_USERNAME: workshops_user
-      SPRING_DATASOURCE_PASSWORD: oc2024
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${POSTGRES_PORT}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
@@ -18,13 +18,13 @@ services:
     volumes:
       - postgres18-data:/var/lib/postgresql
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:?Set POSTGRES_PORT in .env}:5432"
     environment:
-      POSTGRES_USER: workshops_user
-      POSTGRES_PASSWORD: oc2024
-      POSTGRES_DB: workshopsdb
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U workshops_user -d workshopsdb"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?Set POSTGRES_USER in .env} -d ${POSTGRES_DB:?Set POSTGRES_DB in .env}"]
       interval: 5s
       timeout: 3s
       retries: 10
