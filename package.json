@@ -1,6 +1,6 @@
 {
   "name": "@manooweb/projet6-back",
-  "version": "0.2.4",
+  "version": "1.0.0",
   "private": true,
   "description": "Release tooling for projet6-back",
   "devDependencies": {
