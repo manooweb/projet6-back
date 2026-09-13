@@ -76,7 +76,7 @@ To run tests locally, run:
 ./gradlew clean test
 ```
 
-Gradle writes its reports to `build/test-results/test`. For CI, `./run-tests.sh` cleans `test-results/`, runs `./gradlew clean test`, and copies the JUnit XML reports there.
+Gradle writes its reports to `build/test-results/test`. For CI, `./run-tests.sh` automatically detects the project type, cleans `test-results/`, runs `./gradlew clean test`, and copies the JUnit XML reports there.
 
 ## Packaging
 
