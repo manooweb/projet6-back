@@ -50,11 +50,20 @@ docker compose up -d
 
 ## Configuration
 
-You can configure the application with these environment variables
+Before starting the application with Docker Compose, copy the example configuration file:
 
-- SPRING_DATASOURCE_URL: JDBC URI for DB access (ex. jdbc:postgresql://db:5432/mydatabase)
-- SPRING_DATASOURCE_USERNAME: Database user name used by the application
-- SPRING_DATASOURCE_PASSWORD: Database user password used by the application
+```bash
+cp .env.example .env
+```
+
+Then set these database environment variables in `.env`:
+
+- `POSTGRES_USER`: Database user name.
+- `POSTGRES_PASSWORD`: Database user password.
+- `POSTGRES_DB`: Database name.
+- `POSTGRES_PORT`: PostgreSQL port. Use `5432` with the current Compose configuration.
+
+Docker Compose derives the Spring Boot datasource settings from these values.
 
 ## Testing
 
